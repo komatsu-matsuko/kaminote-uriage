@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>麺昇 神の手 売上・来客数シミュレーション</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 15px;
+            background-color: #b71c1c; /* 赤色 */
+            border-bottom: 4px solid #000000; /* 黒色 */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        h2 {
+            color: #b71c1c; /* 赤色 */
+            margin-top: 25px;
+            border-left: 5px solid #b71c1c;
+            padding-left: 10px;
+        }
+        h3 {
+            color: #000000; /* 黒色 */
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #b71c1c; /* 赤色 */
+            color: white;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #ffe6e6; /* 薄い赤色 */
+        }
+        .highlight {
+            background-color: #ffebee; /* 薄い赤色 */
+            font-weight: bold;
+        }
+        .summary-box {
+            background-color: #f5f5f5; /* グレー */
+            border-left: 5px solid #b71c1c; /* 赤色 */
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .calculation {
+            font-family: monospace;
+            background-color: #f0f0f0; /* グレー */
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            border-left: 3px solid #000000; /* 黒色 */
+        }
+        .control-panel {
+            background-color: #263238; /* 黒に近いグレー */
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            color: #ffffff;
+        }
+        .control-panel h2 {
+            color: #ffffff;
+            border-left: 5px solid #ff5252; /* 明るい赤色 */
+        }
+        label {
+            font-weight: bold;
+            margin-right: 10px;
+            color: #ffffff;
+        }
+        input[type="number"] {
+            padding: 10px;
+            border: 1px solid #b71c1c;
+            border-radius: 4px;
+            width: 80px;
+            background-color: #424242; /* グレー */
+            color: #ffffff;
+        }
+        button {
+            background-color: #b71c1c; /* 赤色 */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 10px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #d32f2f; /* 明るい赤色 */
+        }
+        .parameter-input {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        #resultsContainer {
+            transition: all 0.3s ease;
+        }
+        .flash {
+            animation: flash-animation 0.5s;
+        }
+        @keyframes flash-animation {
+            0% { background-color: rgba(183, 28, 28, 0.3); } /* 薄い赤色 */
+            100% { background-color: transparent; }
+        }
+                h1 {
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 15px 15px 15px 100px; /* 左側に余白を追加 */
+            background-color: #b71c1c; /* 赤色 */
+            border-bottom: 4px solid #000000; /* 黒色 */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            position: relative; /* ロゴの配置のため */
+        }
+        .title-wrapper {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .logo-image {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background-color: white;
+            padding: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .subtitle {
+            display: block;
+            font-size: 0.5em;
+            font-weight: normal;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title-wrapper">
+            <h1>
+                <img src="https://mensyou-kaminote.com/struct/wp-content/uploads/55c7f0fb640d228075c45017941131f4.png" alt="麺昇 神の手 ロゴ" class="logo-image">
+                麺昇 神の手<span class="subtitle">売上・来客数シミュレーション</span>
+            </h1>
+        </div>
+        
+        <div class="control-panel">
+            <h2>パラメータ設定</h2>
+            <div class="parameter-input">
+                <label for="vacancyRate">平均空席率 (%): </label>
+                <input type="number" id="vacancyRate" min="0" max="100" value="40" step="5">
+                <span style="margin-left: 10px; color: #ffffff;">（稼働率: <span id="occupancyRate">60</span>%）</span>
+                <button id="calculateBtn">計算する</button>
+            </div>
+            
+            <div class="parameter-input">
+                <label for="seats">座席数: </label>
+                <input type="number" id="seats" min="1" value="18">
+            </div>
+            
+            <div class="parameter-input">
+                <label for="lunchPrice">昼の平均客単価 (円): </label>
+                <input type="number" id="lunchPrice" min="0" value="1050" step="50">
+            </div>
+            
+            <div class="parameter-input">
+                <label for="dinnerPrice">夜の平均客単価 (円): </label>
+                <input type="number" id="dinnerPrice" min="0" value="1500" step="50">
+            </div>
+            
+            <div class="parameter-input">
+                <label for="daysPerMonth">月間営業日数: </label>
+                <input type="number" id="daysPerMonth" min="1" max="31" value="30">
+            </div>
+        </div>
+
+        <div id="resultsContainer">
+            <div class="summary-box">
+                <h2>前提条件</h2>
+                <table>
+                    <tr>
+                        <th>項目</th>
+                        <th>詳細</th>
+                    </tr>
+                    <tr>
+                        <td>座席数</td>
+                        <td id="summarySeats">18席</td>
+                    </tr>
+                    <tr>
+                        <td>営業時間</td>
+                        <td>11:00～23:00（12時間）</td>
+                    </tr>
+                    <tr>
+                        <td>平均客単価（昼）</td>
+                        <td id="summaryLunchPrice">1,050円 (11:00～18:00)</td>
+                    </tr>
+                    <tr>
+                        <td>平均客単価（夜）</td>
+                        <td id="summaryDinnerPrice">1,500円 (18:00～23:00)</td>
+                    </tr>
+                    <tr>
+                        <td>平均滞在時間（昼）</td>
+                        <td>30分（0.5時間）</td>
+                    </tr>
+                    <tr>
+                        <td>平均滞在時間（夜）</td>
+                        <td>1時間</td>
+                    </tr>
+                    <tr>
+                        <td>月間営業日数</td>
+                        <td id="summaryDaysPerMonth">30日</td>
+                    </tr>
+                    <tr>
+                        <td>平均空席率</td>
+                        <td id="summaryVacancyRate">40%（稼働率60%）</td>
+                    </tr>
+                </table>
+            </div>
+
+            <h2>時間帯別集計</h2>
+            <table>
+                <tr>
+                    <th>項目</th>
+                    <th>昼（11:00～18:00）</th>
+                    <th>夜（18:00～23:00）</th>
+                    <th>合計</th>
+                </tr>
+                <tr>
+                    <td>平均滞在時間</td>
+                    <td>30分（0.5時間）</td>
+                    <td>1時間</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>回転率</td>
+                    <td>2.0回転/時間</td>
+                    <td>1.0回転/時間</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>時間数</td>
+                    <td>7時間</td>
+                    <td>5時間</td>
+                    <td>12時間</td>
+                </tr>
+                <tr>
+                    <td>平均客単価</td>
+                    <td id="tableLunchPrice">1,050円</td>
+                    <td id="tableDinnerPrice">1,500円</td>
+                    <td>-</td>
+                </tr>
+                <tr class="highlight">
+                    <td>1日来客数</td>
+                    <td id="dailyLunchCustomers">151.2人</td>
+                    <td id="dailyDinnerCustomers">54.0人</td>
+                    <td id="dailyTotalCustomers">205.2人</td>
+                </tr>
+                <tr class="highlight">
+                    <td>月間来客数</td>
+                    <td id="monthlyLunchCustomers">4,536人</td>
+                    <td id="monthlyDinnerCustomers">1,620人</td>
+                    <td id="monthlyTotalCustomers">6,156人</td>
+                </tr>
+                <tr class="highlight">
+                    <td>月間売上</td>
+                    <td id="monthlyLunchSales">4,762,800円</td>
+                    <td id="monthlyDinnerSales">2,430,000円</td>
+                    <td id="monthlyTotalSales">7,192,800円</td>
+                </tr>
+            </table>
+
+            <h2>計算式詳細</h2>
+            <div class="summary-box">
+                <h3>昼（11:00～18:00）の計算</h3>
+                <div class="calculation">
+                    <p><strong>1日来客数:</strong> <span id="lunchCalcDaily">18席 × 2.0回転/時間 × 7時間 × (1-0.4) = 151.2人</span></p>
+                    <p><strong>月間来客数:</strong> <span id="lunchCalcMonthly">151.2人 × 30日 = 4,536人</span></p>
+                    <p><strong>月間売上:</strong> <span id="lunchCalcSales">4,536人 × 1,050円 = 4,762,800円</span></p>
+                </div>
+                
+                <h3>夜（18:00～23:00）の計算</h3>
+                <div class="calculation">
+                    <p><strong>1日来客数:</strong> <span id="dinnerCalcDaily">18席 × 1.0回転/時間 × 5時間 × (1-0.4) = 54.0人</span></p>
+                    <p><strong>月間来客数:</strong> <span id="dinnerCalcMonthly">54.0人 × 30日 = 1,620人</span></p>
+                    <p><strong>月間売上:</strong> <span id="dinnerCalcSales">1,620人 × 1,500円 = 2,430,000円</span></p>
+                </div>
+                
+                <h3>合計</h3>
+                <div class="calculation">
+                    <p><strong>1日総来客数:</strong> <span id="totalCalcDaily">151.2人 + 54.0人 = 205.2人</span></p>
+                    <p><strong>月間総来客数:</strong> <span id="totalCalcMonthly">4,536人 + 1,620人 = 6,156人</span></p>
+                    <p><strong>総売上（昼＋夜）:</strong> <span id="totalCalcSales">4,762,800円 + 2,430,000円 = 7,192,800円</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 数値をフォーマットする関数（3桁区切りのカンマ）
+        function formatNumber(num) {
+            return num.toLocaleString('ja-JP');
+        }
+        
+        // 小数点以下1桁までの数値を表示する関数
+        function formatDecimal(num) {
+            return Number(num.toFixed(1)).toLocaleString('ja-JP');
+        }
+        
+        // 計算を実行する関数
+        function calculateResults() {
+            // パラメータの取得
+            const vacancyRate = parseFloat(document.getElementById('vacancyRate').value) / 100;
+            const occupancyRate = 1 - vacancyRate;
+            const seats = parseInt(document.getElementById('seats').value);
+            const lunchPrice = parseInt(document.getElementById('lunchPrice').value);
+            const dinnerPrice = parseInt(document.getElementById('dinnerPrice').value);
+            const daysPerMonth = parseInt(document.getElementById('daysPerMonth').value);
+            
+            // 定数
+            const lunchHours = 7; // 11:00-18:00
+            const dinnerHours = 5; // 18:00-23:00
+            const lunchTurnoverRate = 2.0; // 1時間あたり2.0回転（平均滞在30分）
+            const dinnerTurnoverRate = 1.0; // 1時間あたり1.0回転（平均滞在1時間）
+            
+            // 計算
+            // 昼の計算
+            const dailyLunchCustomers = seats * lunchTurnoverRate * lunchHours * occupancyRate;
+            const monthlyLunchCustomers = dailyLunchCustomers * daysPerMonth;
+            const monthlyLunchSales = monthlyLunchCustomers * lunchPrice;
+            
+            // 夜の計算
+            const dailyDinnerCustomers = seats * dinnerTurnoverRate * dinnerHours * occupancyRate;
+            const monthlyDinnerCustomers = dailyDinnerCustomers * daysPerMonth;
+            const monthlyDinnerSales = monthlyDinnerCustomers * dinnerPrice;
+            
+            // 合計
+            const dailyTotalCustomers = dailyLunchCustomers + dailyDinnerCustomers;
+            const monthlyTotalCustomers = monthlyLunchCustomers + monthlyDinnerCustomers;
+            const monthlyTotalSales = monthlyLunchSales + monthlyDinnerSales;
+            
+            // 結果の更新
+            // 前提条件の更新
+            document.getElementById('summarySeats').textContent = `${seats}席`;
+            document.getElementById('summaryLunchPrice').textContent = `${formatNumber(lunchPrice)}円 (11:00～18:00)`;
+            document.getElementById('summaryDinnerPrice').textContent = `${formatNumber(dinnerPrice)}円 (18:00～23:00)`;
+            document.getElementById('summaryDaysPerMonth').textContent = `${daysPerMonth}日`;
+            document.getElementById('summaryVacancyRate').textContent = `${(vacancyRate * 100).toFixed(0)}%（稼働率${(occupancyRate * 100).toFixed(0)}%）`;
+            document.getElementById('occupancyRate').textContent = (occupancyRate * 100).toFixed(0);
+            
+            // 時間帯別集計の更新
+            document.getElementById('tableLunchPrice').textContent = `${formatNumber(lunchPrice)}円`;
+            document.getElementById('tableDinnerPrice').textContent = `${formatNumber(dinnerPrice)}円`;
+            document.getElementById('dailyLunchCustomers').textContent = `${formatDecimal(dailyLunchCustomers)}人`;
+            document.getElementById('dailyDinnerCustomers').textContent = `${formatDecimal(dailyDinnerCustomers)}人`;
+            document.getElementById('dailyTotalCustomers').textContent = `${formatDecimal(dailyTotalCustomers)}人`;
+            document.getElementById('monthlyLunchCustomers').textContent = `${formatNumber(Math.round(monthlyLunchCustomers))}人`;
+            document.getElementById('monthlyDinnerCustomers').textContent = `${formatNumber(Math.round(monthlyDinnerCustomers))}人`;
+            document.getElementById('monthlyTotalCustomers').textContent = `${formatNumber(Math.round(monthlyTotalCustomers))}人`;
+            document.getElementById('monthlyLunchSales').textContent = `${formatNumber(Math.round(monthlyLunchSales))}円`;
+            document.getElementById('monthlyDinnerSales').textContent = `${formatNumber(Math.round(monthlyDinnerSales))}円`;
+            document.getElementById('monthlyTotalSales').textContent = `${formatNumber(Math.round(monthlyTotalSales))}円`;
+            
+            // 計算式詳細の更新
+            document.getElementById('lunchCalcDaily').textContent = `${seats}席 × ${lunchTurnoverRate}回転/時間 × ${lunchHours}時間 × (1-${vacancyRate.toFixed(2)}) = ${formatDecimal(dailyLunchCustomers)}人`;
+            document.getElementById('lunchCalcMonthly').textContent = `${formatDecimal(dailyLunchCustomers)}人 × ${daysPerMonth}日 = ${formatNumber(Math.round(monthlyLunchCustomers))}人`;
+            document.getElementById('lunchCalcSales').textContent = `${formatNumber(Math.round(monthlyLunchCustomers))}人 × ${formatNumber(lunchPrice)}円 = ${formatNumber(Math.round(monthlyLunchSales))}円`;
+            
+            document.getElementById('dinnerCalcDaily').textContent = `${seats}席 × ${dinnerTurnoverRate}回転/時間 × ${dinnerHours}時間 × (1-${vacancyRate.toFixed(2)}) = ${formatDecimal(dailyDinnerCustomers)}人`;
+            document.getElementById('dinnerCalcMonthly').textContent = `${formatDecimal(dailyDinnerCustomers)}人 × ${daysPerMonth}日 = ${formatNumber(Math.round(monthlyDinnerCustomers))}人`;
+            document.getElementById('dinnerCalcSales').textContent = `${formatNumber(Math.round(monthlyDinnerCustomers))}人 × ${formatNumber(dinnerPrice)}円 = ${formatNumber(Math.round(monthlyDinnerSales))}円`;
+            
+            document.getElementById('totalCalcDaily').textContent = `${formatDecimal(dailyLunchCustomers)}人 + ${formatDecimal(dailyDinnerCustomers)}人 = ${formatDecimal(dailyTotalCustomers)}人`;
+            document.getElementById('totalCalcMonthly').textContent = `${formatNumber(Math.round(monthlyLunchCustomers))}人 + ${formatNumber(Math.round(monthlyDinnerCustomers))}人 = ${formatNumber(Math.round(monthlyTotalCustomers))}人`;
+            document.getElementById('totalCalcSales').textContent = `${formatNumber(Math.round(monthlyLunchSales))}円 + ${formatNumber(Math.round(monthlyDinnerSales))}円 = ${formatNumber(Math.round(monthlyTotalSales))}円`;
+            
+            // 結果が更新されたことを視覚的に示す
+            const resultsContainer = document.getElementById('resultsContainer');
+            resultsContainer.classList.add('flash');
+            setTimeout(() => {
+                resultsContainer.classList.remove('flash');
+            }, 500);
+        }
+        
+        // 初期計算を実行
+        document.addEventListener('DOMContentLoaded', calculateResults);
+        
+        // イベントリスナーの設定
+        document.getElementById('calculateBtn').addEventListener('click', calculateResults);
+        
+        // 空席率の入力に合わせて稼働率を更新
+        document.getElementById('vacancyRate').addEventListener('input', function() {
+            const vacancyRate = parseFloat(this.value);
+            if (!isNaN(vacancyRate)) {
+                const occupancyRate = 100 - vacancyRate;
+                document.getElementById('occupancyRate').textContent = occupancyRate;
+            }
+        });
+    </script>
+</body>
+</html>
