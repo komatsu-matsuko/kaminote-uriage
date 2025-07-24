@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>業務可視化バインダーシステム</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background: #f8f9fa;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        /* ヒーローセクション */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        /* セクション共通 */
+        .section {
+            padding: 60px 40px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .section h2 {
+            font-size: 2rem;
+            color: #495057;
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .section h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: #667eea;
+        }
+        
+        /* 問題提起セクション */
+        .problem-intro {
+            background: #f8f9fa;
+            padding: 40px;
+            border-radius: 10px;
+            margin-bottom: 40px;
+        }
+        
+        .voice-bubble {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            position: relative;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            font-style: italic;
+            color: #6c757d;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+        
+        .voice-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 40px;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid white;
+        }
+        
+        /* 問題カード */
+        .problems-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+        
+        .problem-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease;
+            border-left: 5px solid #dc3545;
+        }
+        
+        .problem-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .problem-icon {
+            width: 60px;
+            height: 60px;
+            background: #fee;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+        
+        .problem-card h3 {
+            color: #dc3545;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        /* ソリューションセクション */
+        .solution-header {
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            margin-bottom: 40px;
+        }
+        
+        .solution-header h2 {
+            color: white;
+            margin-bottom: 20px;
+        }
+        
+        .solution-header h2::after {
+            background: white;
+        }
+        
+        .binder-visual {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin: 40px 0;
+        }
+        
+        .binder-spread {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            border: 3px solid #dee2e6;
+            position: relative;
+        }
+        
+        .binder-spread::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 3px;
+            height: 100%;
+            background: #adb5bd;
+            transform: translateX(-50%);
+        }
+        
+        .page {
+            background: white;
+            padding: 25px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .page h4 {
+            color: #495057;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+        
+        .task-item:hover {
+            background: #e9ecef;
+        }
+        
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #6c757d;
+            border-radius: 4px;
+            margin-right: 15px;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .checkbox.checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #28a745;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .task-info {
+            flex: 1;
+        }
+        
+        .task-person {
+            background: #667eea;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            margin-left: 10px;
+        }
+        
+        /* 運用フロー */
+        .flow-container {
+            margin: 40px 0;
+        }
+        
+        .flow-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .flow-step:hover {
+            transform: translateX(10px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-right: 25px;
+            flex-shrink: 0;
+        }
+        
+        .step-content h4 {
+            color: #495057;
+            margin-bottom: 10px;
+        }
+        
+        /* 効果セクション */
+        .effects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .effect-card {
+            background: white;
+            padding: 35px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            text-align: center;
+            transition: all 0.3s ease;
+            border-top: 5px solid #28a745;
+        }
+        
+        .effect-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .effect-icon {
+            width: 80px;
+            height: 80px;
+            background: #d4edda;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 36px;
+        }
+        
+        .effect-card h3 {
+            color: #28a745;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+        
+        /* ビフォーアフター */
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 40px 0;
+        }
+        
+        .before, .after {
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        
+        .before {
+            background: #fee;
+            border: 2px solid #dc3545;
+        }
+        
+        .after {
+            background: #d4edda;
+            border: 2px solid #28a745;
+        }
+        
+        .before h3 {
+            color: #dc3545;
+            margin-bottom: 20px;
+        }
+        
+        .after h3 {
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+        
+        /* CTA */
+        .cta {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+        
+        .cta h2 {
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .cta h2::after {
+            background: white;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: white;
+            color: #667eea;
+            padding: 15px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+        
+        .cta-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        /* 情報ソース */
+        .sources {
+            background: #f8f9fa;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .sources h3 {
+            color: #6c757d;
+            margin-bottom: 20px;
+        }
+        
+        .source-link {
+            display: inline-block;
+            color: #667eea;
+            text-decoration: none;
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            border-radius: 25px;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .source-link:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        /* アニメーション */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        /* レスポンシブ対応 */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .problems-grid,
+            .effects-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+            
+            .binder-spread {
+                grid-template-columns: 1fr;
+            }
+            
+            .binder-spread::after {
+                display: none;
+            }
+            
+            .section {
+                padding: 40px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ヒーローセクション -->
+        <div class="hero animate-in">
+            <h1>業務可視化バインダーシステム</h1>
+            <p>全員が主体的に動ける、公平で透明な職場環境へ</p>
+        </div>
+        
+        <!-- 問題提起セクション -->
+        <div class="section">
+            <h2>現場の声</h2>
+            <div class="problem-intro">
+                <div class="voice-bubble">
+                    「今日も結局、私が全部片付けることになった...」<br>
+                    「なんで私ばかり？みんなは何してるの？」
+                </div>
+                <p style="color: #6c757d; text-align: center;">
+                    こんな思いを抱えながら働いていませんか？
+                </p>
+            </div>
+            
+            <h3 style="text-align: center; margin-bottom: 30px; color: #495057;">
+                飲食店が抱える4つの課題
+            </h3>
+            
+            <div class="problems-grid">
+                <div class="problem-card animate-in">
+                    <div class="problem-icon">⚖️</div>
+                    <h3>業務量の不公平</h3>
+                    <p>特定のスタッフに仕事が集中し、負担が偏ってしまう状況が常態化</p>
+                </div>
+                
+                <div class="problem-card animate-in" style="animation-delay: 0.1s;">
+                    <div class="problem-icon">🧹</div>
+                    <h3>品質のバラつき</h3>
+                    <p>清掃や衛生管理の基準が人によって異なり、店舗の品質が不安定に</p>
+                </div>
+                
+                <div class="problem-card animate-in" style="animation-delay: 0.2s;">
+                    <div class="problem-icon">😔</div>
+                    <h3>他責の文化</h3>
+                    <p>「誰かがやってくれる」という考えが蔓延し、責任感が希薄化</p>
+                </div>
+                
+                <div class="problem-card animate-in" style="animation-delay: 0.3s;">
+                    <div class="problem-icon">💔</div>
+                    <h3>優秀な人材の疲弊</h3>
+                    <p>頑張る人ほど負担が増え、モチベーション低下や離職につながる</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ソリューション提示セクション -->
+        <div class="section">
+            <div class="solution-header">
+                <h2>解決策：業務可視化バインダー</h2>
+                <p>シンプルな仕組みで、大きな変革を</p>
+            </div>
+            
+            <div class="binder-visual animate-in">
+                <h3 style="text-align: center; margin-bottom: 30px; color: #495057;">
+                    A4バインダーの見開きで業務を可視化
+                </h3>
+                <p style="text-align: center; color: #6c757d; margin-bottom: 30px;">
+                    見開き2ページ = 1日の日報
+                </p>
+                <div style="text-align: center; margin: 40px 0;">
+                    <img src="https://github.com/komatsu-matsuko/kaminote-inventory/blob/main/%E6%8A%BC%E5%B0%BE.png?raw=true" 
+                         alt="バインダーを持つスタッフのイラスト" 
+                         style="max-width: 100%; height: auto; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                </div>
+                <p style="text-align: center; margin-top: 30px; color: #6c757d;">
+                    <strong>左ページ：</strong>朝の仕込み・朝のオープン作業・夜の閉店リスト<br>
+                    <strong>右ページ：</strong>衛生管理・締め作業・清掃リスト
+                </p>
+            </div>
+        </div>
+        
+        <!-- 運用方法セクション -->
+        <div class="section">
+            <h2>カンタン！運用の流れ</h2>
+            
+            <div class="flow-container">
+                <div class="flow-step animate-in">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>業務の洗い出し</h4>
+                        <p>日々の業務を全てリストアップし、必要な作業を明確化します</p>
+                    </div>
+                </div>
+                
+                <div class="flow-step animate-in" style="animation-delay: 0.1s;">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>公平な割り振り</h4>
+                        <p>スタッフの能力と業務量を考慮し、バランスよく担当を決定</p>
+                    </div>
+                </div>
+                
+                <div class="flow-step animate-in" style="animation-delay: 0.2s;">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>バインダーに記載</h4>
+                        <p>見開きページに業務と担当者を明記し、共有スペースに設置</p>
+                    </div>
+                </div>
+                
+                <div class="flow-step animate-in" style="animation-delay: 0.3s;">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>実施とチェック</h4>
+                        <p>完了したらチェックを入れ、進捗が一目で分かる仕組みに</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 効果セクション -->
+        <div class="section">
+            <h2>導入で変わる6つのこと</h2>
+            
+            <div class="effects-grid">
+                <div class="effect-card animate-in">
+                    <div class="effect-icon">📊</div>
+                    <h3>業務の見える化</h3>
+                    <p>誰が何をしているか、何が終わっていないかが一目瞭然に</p>
+                </div>
+                
+                <div class="effect-card animate-in" style="animation-delay: 0.1s;">
+                    <div class="effect-icon">🤝</div>
+                    <h3>公平な負担分配</h3>
+                    <p>全員に適切な業務量が割り当てられ、不公平感が解消</p>
+                </div>
+                
+                <div class="effect-card animate-in" style="animation-delay: 0.2s;">
+                    <div class="effect-icon">✨</div>
+                    <h3>品質の統一</h3>
+                    <p>担当が明確になることで、作業品質が安定・向上</p>
+                </div>
+                
+                <div class="effect-card animate-in" style="animation-delay: 0.3s;">
+                    <div class="effect-icon">💪</div>
+                    <h3>責任感の醸成</h3>
+                    <p>自分の仕事が明確になり、主体的な行動が増加</p>
+                </div>
+                
+                <div class="effect-card animate-in" style="animation-delay: 0.4s;">
+                    <div class="effect-icon">😊</div>
+                    <h3>モチベーション向上</h3>
+                    <p>努力が可視化され、適切に評価される環境に</p>
+                </div>
+                
+                <div class="effect-card animate-in" style="animation-delay: 0.5s;">
+                    <div class="effect-icon">🏢</div>
+                    <h3>組織文化の改革</h3>
+                    <p>「みんなで支え合う」健全な職場文化が定着</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ビフォーアフター -->
+        <div class="section">
+            <h2>導入前後の変化</h2>
+            
+            <div class="comparison">
+                <div class="before animate-in">
+                    <h3>導入前</h3>
+                    <ul style="text-align: left; list-style: none;">
+                        <li>❌ 「今日も私ばかり...」</li>
+                        <li>❌ 「誰がやるの？」の押し付け合い</li>
+                        <li>❌ できる人に仕事が集中</li>
+                        <li>❌ 不満とストレスの蓄積</li>
+                    </ul>
+                </div>
+                
+                <div class="after animate-in" style="animation-delay: 0.2s;">
+                    <h3>導入後</h3>
+                    <ul style="text-align: left; list-style: none;">
+                        <li>✅ 「今日の私の仕事は完了！」</li>
+                        <li>✅ 明確な役割分担で迷いなし</li>
+                        <li>✅ 全員が均等に貢献</li>
+                        <li>✅ 達成感と充実感の共有</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- よくある質問 -->
+        <div class="section">
+            <h2>よくある質問</h2>
+            
+            <div style="max-width: 700px; margin: 0 auto;">
+                <div style="background: #f8f9fa; padding: 25px; border-radius: 10px; margin-bottom: 20px;">
+                    <h4 style="color: #495057; margin-bottom: 10px;">Q: スタッフが抵抗を示したらどうすれば？</h4>
+                    <p>A: まず少人数でテスト導入し、効果を実感してもらいましょう。透明性が高まることで、頑張っている人が正当に評価されることを伝えることが大切です。</p>
+                </div>
+                
+                <div style="background: #f8f9fa; padding: 25px; border-radius: 10px; margin-bottom: 20px;">
+                    <h4 style="color: #495057; margin-bottom: 10px;">Q: 業務量の調整はどのくらいの頻度で？</h4>
+                    <p>A: 月1回の見直しがおすすめです。実際の作業時間を計測し、不公平が生じていないか定期的にチェックしましょう。</p>
+                </div>
+                
+                <div style="background: #f8f9fa; padding: 25px; border-radius: 10px;">
+                    <h4 style="color: #495057; margin-bottom: 10px;">Q: デジタル化した方が良いのでは？</h4>
+                    <p>A: アナログのバインダーには「誰でも一目で分かる」「すぐに記入できる」という利点があります。デジタル化は定着後の次のステップとして検討しましょう。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // スクロールアニメーション
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+        
+        document.querySelectorAll('.animate-in').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'all 0.6s ease-out';
+            observer.observe(el);
+        });
+        
+        // チェックボックスのインタラクション
+        document.querySelectorAll('.checkbox').forEach(checkbox => {
+            checkbox.addEventListener('click', function() {
+                this.classList.toggle('checked');
+            });
+        });
+    </script>
+</body>
+</html>
